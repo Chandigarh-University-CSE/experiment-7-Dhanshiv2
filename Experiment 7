@@ -1,0 +1,103 @@
+1.Remove-stones-to-minimize-the-total
+Code: class Solution {
+    public int minStoneSum(int[] piles, int k) {
+        Queue<Integer> p = new PriorityQueue<>((a, b) -> b-a);
+        int s = 0; // total sum
+        int d = 0; // delta removed
+
+        for (int x : piles) {
+            s += x;
+            p.offer(x);
+        }
+        while (k >0) {
+            int c = p.poll();
+            int x = c/2;
+            d += x;
+            p.offer(c-x); //extract largest pills
+            k--;
+        }
+        return s - d;
+    }
+}
+2. Minimum-operations-to-make-the-array-increasing
+Code: class Solution {
+    public int minOperations(int[] nums) {
+        int len=nums.length;
+        int arr[]=new int[len];
+        int count=0;
+        for(int i=0; i<len; i++){
+            arr[i] = nums[i];
+        }
+        for(int i=0; i<len-1; i++){
+            if(arr[i+1] <= arr[i]){
+                arr[i+1] = arr[i]+1;
+            }
+        }
+        for(int i=0; i<len; i++){
+            count+=arr[i]-nums[i];
+        }
+        return count;
+    }
+}
+3. Maximum-number-of-tasks-you-can-assign
+Code: class Solution {
+    public int maxTaskAssign(int[] tasks, int[] workers, int pills, int strength) {
+        Arrays.sort(tasks);
+        Arrays.sort(workers);
+        int low=0;
+        int high=tasks.length;
+        int ans=0;
+        while(low<=high)
+        {
+            int mid=(low+high)/2;
+			//Check if  task assignment is possible
+            if(isPossible(tasks,workers,pills,strength,mid))
+            {
+                ans=mid;
+                low=mid+1;
+            }else{
+                high=mid-1;
+            }
+        }
+        return ans;
+        
+    }
+    
+    public boolean isPossible(int tasks[],int workers[],int pills,int strength,int n)
+    {
+        if(Math.min(workers.length,tasks.length)<n)
+            return false;
+        TreeMap<Integer,Integer> tm=new TreeMap<>();
+		
+		//Will add smallest n tasks to treemap
+        for(int i=0;i<n;i++)
+        {
+            tm.put(tasks[i],tm.getOrDefault(tasks[i],0)+1);
+        }
+		
+		//Will take n workers with most strength
+        for(int j=workers.length-n;j<workers.length;j++)
+        {
+            int smallest=tm.firstKey();
+            if(workers[j]<smallest)
+            {
+				//case 2: worker can not finish the task without the pill
+                if(pills==0)
+                    return false;
+                pills--;
+                if(tm.floorKey(workers[j]+strength)!=null)
+                    smallest=tm.floorKey(workers[j]+strength);
+                else
+                    return false;
+                
+            }
+            //smallest is the task which workers[j] can do
+            if(tm.get(smallest)==1)
+                tm.remove(smallest);
+            else
+                tm.put(smallest,tm.get(smallest)-1);
+        }
+        return true;
+    }
+}
+ 
